@@ -1,0 +1,21 @@
+{
+  "name": "takehome-07-property-rental",
+  "version": "1.0.0",
+  "description": "Picture a small property management company handling a portfolio of a few dozen rental units on behalf of several landlords — collecting monthly rent, keeping units occupied, and sending someone out whenever a tenant reports something broken. Rent arrives by bank transfer or check and gets checked off against a spreadsheet by hand, and repair requests come in over the phone and get written on whatever notepad is nearest the desk that day.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "knex": "^3.3.0",
+    "pg": "^8.23.0"
+  }
+}
