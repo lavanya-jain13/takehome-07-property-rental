@@ -29,10 +29,18 @@ const validateBulkPayments = (data) => {
     throw new Error("EMPTY_PAYMENTS");
   }
 
+  const unitIds = new Set();
+
   for (const payment of payments) {
     if (!payment.unitId || payment.amount === undefined) {
       throw new Error("VALIDATION_ERROR");
     }
+
+    if (unitIds.has(payment.unitId)) {
+      throw new Error("DUPLICATE_UNIT_IN_BATCH");
+    }
+
+    unitIds.add(payment.unitId);
 
     if (
       Number.isNaN(Number(payment.amount)) ||
