@@ -48,9 +48,41 @@ const update = async (id, data) => {
   return unit;
 };
 
+const findByIdWithMaintenanceRequests = async (id) => {
+  const unit = await db("units")
+    .where({ id })
+    .first();
+
+  if (!unit) {
+    return null;
+  }
+
+  const maintenanceRequests = await db("maintenance_requests")
+    .where({
+      unit_id: id,
+    })
+    .select(
+      "id",
+      "title",
+      "description",
+      "priority",
+      "status",
+      "created_by",
+      "created_at",
+      "updated_at"
+    )
+    .orderBy("created_at", "desc");
+
+  return {
+    ...unit,
+    maintenanceRequests,
+  };
+};
+
 module.exports = {
   findAll,
   findById,
+  findByIdWithMaintenanceRequests,
   create,
   update,
 };

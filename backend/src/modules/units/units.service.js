@@ -36,13 +36,18 @@ const listUnits = async ({ status, page = 1, limit = 20 }) => {
 };
 
 const getUnit = async (id) => {
-  const unit = await repository.findById(id);
+  const unit = await repository.findByIdWithMaintenanceRequests(id);
 
   if (!unit) {
     throw new Error("UNIT_NOT_FOUND");
   }
 
-  return formatUnit(unit);
+  return {
+    ...formatUnit(unit),
+    maintenanceRequests: unit.maintenanceRequests.map(
+      formatMaintenanceRequest
+    ),
+  };
 };
 
 const createUnit = async (data) => {
@@ -170,6 +175,17 @@ const formatUnit = (unit) => ({
   status: unit.status,
   createdAt: unit.created_at,
   updatedAt: unit.updated_at,
+});
+
+const formatMaintenanceRequest = (request) => ({
+  id: request.id,
+  title: request.title,
+  description: request.description,
+  priority: request.priority,
+  status: request.status,
+  createdBy: request.created_by,
+  createdAt: request.created_at,
+  updatedAt: request.updated_at,
 });
 
 module.exports = {
