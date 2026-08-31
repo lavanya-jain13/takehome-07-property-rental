@@ -5,6 +5,7 @@ const authRoutes = require("./modules/auth/auth.routes");
 const unitsRoutes = require("./modules/units/units.routes");
 const maintenanceRoutes = require("./modules/maintenance/maintenance.routes");
 const rentRoutes = require("./modules/rent/rent.routes");
+const dashboardRoutes = require("./modules/dashboard/dashboard.routes");
 
 const app = express();
 
@@ -24,5 +25,6 @@ app.use(
   maintenanceRoutes
 );
 app.use("/api/rent", rentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 module.exports = app;
