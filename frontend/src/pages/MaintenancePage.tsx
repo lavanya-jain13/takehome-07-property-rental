@@ -128,6 +128,43 @@ function getErrorMessage(error: unknown) {
     : "Something went wrong.";
 }
 
+function formatStatus(status: string) {
+  return status
+    .toLowerCase()
+    .replace(/\b\w/g, (char) =>
+      char.toUpperCase()
+    );
+}
+
+function getTimelineEventMessage(
+  event: MaintenanceRequestDetails["timeline"][number]
+) {
+  if (
+    event.event_type === "STATUS_CHANGED" &&
+    event.old_status &&
+    event.new_status
+  ) {
+    return `Status changed from ${formatStatus(
+      event.old_status
+    )} to ${formatStatus(event.new_status)}.`;
+  }
+
+  if (
+    event.event_type === "REQUEST_CREATED" &&
+    event.new_status
+  ) {
+    return `Request created with status ${formatStatus(
+      event.new_status
+    )}.`;
+  }
+
+  if (event.note) {
+    return event.note;
+  }
+
+  return "No additional details.";
+}
+
 function PriorityBadge({
   priority,
 }: {
@@ -1756,16 +1793,9 @@ function MaintenanceDetailsModal({
                         </strong>
 
                         <p>
-                          {event.note ||
-                            (event.new_status
-                              ? `Status changed to ${event.new_status
-                                  .toLowerCase()
-                                  .replace(
-                                    /\b\w/g,
-                                    (char) =>
-                                      char.toUpperCase()
-                                  )}.`
-                              : "No additional details.")}
+                          {getTimelineEventMessage(
+                            event
+                          )}
                         </p>
 
                         <span>

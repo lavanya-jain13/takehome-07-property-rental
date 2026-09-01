@@ -351,6 +351,10 @@ const removeContractor = async (
     throw new Error("ASSIGNMENT_NOT_FOUND");
   }
 
+  const contractor = await repository.findContractor(
+    contractorId
+  );
+
   const trx = await db.transaction();
 
   try {
@@ -367,7 +371,9 @@ const removeContractor = async (
         event_type: "CONTRACTOR_UNASSIGNED",
         old_status: null,
         new_status: null,
-        note: null,
+        note: `Contractor ${
+          contractor?.name || contractorId
+        } unassigned.`,
       },
       trx
     );
