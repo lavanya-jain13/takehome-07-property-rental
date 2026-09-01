@@ -98,3 +98,294 @@ input {
   color: #dc2626;
   font-size: 14px;
 }
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  background: #f8fafc;
+}
+
+.sidebar {
+  width: 248px;
+  min-height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 14px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 4px 10px 26px;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 800;
+}
+
+.sidebar-brand strong,
+.sidebar-brand span {
+  display: block;
+}
+
+.sidebar-brand strong {
+  font-size: 15px;
+}
+
+.sidebar-brand span {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.sidebar-nav {
+  flex: 1;
+}
+
+.nav-section-title {
+  padding: 0 11px;
+  margin: 0 0 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 11px;
+  margin: 3px 0;
+  border-radius: 8px;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.nav-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.nav-item.active {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  border-top: 1px solid #e2e8f0;
+  padding: 14px 4px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sidebar-user,
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.user-avatar {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.user-avatar.small {
+  width: 32px;
+  height: 32px;
+}
+
+.user-info,
+.topbar-user > div:last-child {
+  min-width: 0;
+}
+
+.user-info strong,
+.user-info span,
+.topbar-user strong,
+.topbar-user span {
+  display: block;
+}
+
+.user-info strong,
+.topbar-user strong {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-info span,
+.topbar-user span {
+  color: #94a3b8;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.logout-button,
+.icon-button {
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.logout-button {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+}
+
+.logout-button:hover,
+.icon-button:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.app-main {
+  width: calc(100% - 248px);
+  margin-left: 248px;
+}
+
+.topbar {
+  height: 76px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+}
+
+.topbar-title h1 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.topbar-title p {
+  margin: 4px 0 0;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-button {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+}
+
+.notification-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  top: 7px;
+  right: 7px;
+  border: 1px solid #fff;
+}
+
+.app-content {
+  padding: 32px;
+}
+
+@media (max-width: 800px) {
+  .sidebar {
+    width: 70px;
+    padding: 20px 10px;
+  }
+
+  .sidebar-brand > div:last-child,
+  .nav-section-title,
+  .nav-item span,
+  .sidebar-footer .user-info {
+    display: none;
+  }
+
+  .nav-item {
+    justify-content: center;
+  }
+
+  .sidebar-footer {
+    justify-content: center;
+  }
+
+  .logout-button {
+    display: none;
+  }
+
+  .app-main {
+    width: calc(100% - 70px);
+    margin-left: 70px;
+  }
+
+  .topbar {
+    padding: 0 20px;
+  }
+
+  .topbar-user > div:last-child {
+    display: none;
+  }
+
+  .app-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 560px) {
+  .topbar {
+    height: 68px;
+  }
+
+  .topbar-actions .icon-button:first-child {
+    display: none;
+  }
+
+  .app-content {
+    padding: 16px;
+  }
+}

@@ -6,6 +6,7 @@ import {
 
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AppLayout from "./layouts/AppLayout";
 
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -27,10 +28,47 @@ function App() {
       />
 
       <Route element={<ProtectedRoute />}>
-        <Route
-          path="/dashboard"
-          element={<DashboardPage />}
-        />
+        <Route element={<AppLayout />}>
+          <Route
+            path="/dashboard"
+            element={<DashboardPage />}
+          />
+
+          <Route
+            path="/properties"
+            element={
+              <div>Properties coming next.</div>
+            }
+          />
+
+          <Route
+            path="/units"
+            element={
+              <div>Units coming next.</div>
+            }
+          />
+
+          <Route
+            path="/maintenance"
+            element={
+              <div>Maintenance coming next.</div>
+            }
+          />
+
+          <Route
+            path="/rent"
+            element={
+              <div>Rent coming next.</div>
+            }
+          />
+
+          <Route
+            path="/rent/alerts"
+            element={
+              <div>Rent alerts coming next.</div>
+            }
+          />
+        </Route>
       </Route>
 
       <Route
