@@ -9,12 +9,19 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import type { UserRole } from "../types/auth";
 
-const navigation = [
+const navigation: {
+  label: string;
+  path: string;
+  icon: typeof LayoutDashboard;
+  roles: UserRole[];
+}[] = [
   {
     label: "Dashboard",
     path: "/dashboard",
     icon: LayoutDashboard,
+    roles: ["MANAGER"],
   },
 //   {
 //     label: "Properties",
@@ -25,21 +32,25 @@ const navigation = [
     label: "Units",
     path: "/units",
     icon: Home,
+    roles: ["MANAGER"],
   },
   {
     label: "Maintenance",
     path: "/maintenance",
     icon: Wrench,
+    roles: ["MANAGER", "CONTRACTOR"],
   },
   {
     label: "Rent",
     path: "/rent",
     icon: IndianRupee,
+    roles: ["MANAGER"],
   },
   {
     label: "Rent Alerts",
     path: "/rent/alerts",
     icon: Bell,
+    roles: ["MANAGER"],
   },
 ];
 
@@ -62,6 +73,13 @@ export default function Sidebar() {
 
         {navigation.map((item) => {
           const Icon = item.icon;
+
+          if (
+            !user ||
+            !item.roles.includes(user.role)
+          ) {
+            return null;
+          }
 
           return (
             <NavLink

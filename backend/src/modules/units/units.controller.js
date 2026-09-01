@@ -37,7 +37,10 @@ const handleError = (res, error) => {
 
 const list = async (req, res) => {
   try {
-    const result = await unitsService.listUnits(req.query);
+    const result = await unitsService.listUnits(
+      req.query,
+      req.user
+    );
 
     return res.status(200).json(result);
   } catch (error) {

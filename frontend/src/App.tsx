@@ -15,7 +15,11 @@ import MaintenancePage from "./pages/MaintenancePage";
 import RentPage from "./pages/RentPage";
 
 function App() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const authorizedHome =
+    user?.role === "CONTRACTOR"
+      ? "/maintenance"
+      : "/dashboard";
 
   return (
     <Routes>
@@ -23,7 +27,10 @@ function App() {
         path="/login"
         element={
           isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
+            <Navigate
+              to={authorizedHome}
+              replace
+            />
           ) : (
             <LoginPage />
           )
@@ -33,9 +40,17 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route
-            path="/dashboard"
-            element={<DashboardPage />}
-          />
+            element={
+              <ProtectedRoute
+                allowedRoles={["MANAGER"]}
+                redirectTo="/maintenance"
+              />
+            }
+          >
+            <Route
+              path="/dashboard"
+              element={<DashboardPage />}
+            />
 {/* 
           <Route
             path="/properties"
@@ -49,21 +64,32 @@ function App() {
             element={<UnitsPage />}
           />
 
+            <Route
+              path="/rent"
+              element={<RentPage />}
+            />
+
+            <Route
+              path="/rent/alerts"
+              element={
+                <div>Rent alerts coming next.</div>
+              }
+            />
+
+            <Route
+              path="/rent-alerts"
+              element={
+                <Navigate
+                  to="/rent/alerts"
+                  replace
+                />
+              }
+            />
+          </Route>
+
           <Route
             path="/maintenance"
             element={<MaintenancePage />}
-          />
-
-          <Route
-            path="/rent"
-            element={<RentPage />}
-          />
-
-          <Route
-            path="/rent/alerts"
-            element={
-              <div>Rent alerts coming next.</div>
-            }
           />
         </Route>
       </Route>
@@ -74,7 +100,7 @@ function App() {
           <Navigate
             to={
               isAuthenticated
-                ? "/dashboard"
+                ? authorizedHome
                 : "/login"
             }
             replace

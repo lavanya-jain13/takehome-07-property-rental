@@ -6,13 +6,17 @@ const controller = require("./units.controller");
 
 const router = express.Router();
 
-router.use(authenticate, authorize("MANAGER"));
+router.use(authenticate);
 
-router.get("/", controller.list);
-router.post("/", controller.create);
-router.get("/:unitId", controller.get);
-router.patch("/:unitId", controller.update);
-router.post("/:unitId/archive", controller.archive);
-router.post("/:unitId/restore", controller.restore);
+router.get(
+  "/",
+  authorize("MANAGER", "CONTRACTOR"),
+  controller.list
+);
+router.post("/", authorize("MANAGER"), controller.create);
+router.get("/:unitId", authorize("MANAGER"), controller.get);
+router.patch("/:unitId", authorize("MANAGER"), controller.update);
+router.post("/:unitId/archive", authorize("MANAGER"), controller.archive);
+router.post("/:unitId/restore", authorize("MANAGER"), controller.restore);
 
 module.exports = router;

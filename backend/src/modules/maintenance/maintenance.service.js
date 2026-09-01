@@ -73,7 +73,7 @@ const getRequest = async (requestId, user) => {
   return formatRequestDetails(request);
 };
 
-const createRequest = async (data, userId) => {
+const createRequest = async (data, user) => {
   validateCreateRequest(data);
 
   const unit = await db("units")
@@ -93,7 +93,7 @@ const createRequest = async (data, userId) => {
     const request = await repository.create(
       {
         unit_id: data.unitId,
-        created_by: userId,
+        created_by: user.id,
         title: data.title || "Maintenance Request",
         description: data.description,
         priority: data.priority,
@@ -105,7 +105,7 @@ const createRequest = async (data, userId) => {
     await repository.createTimelineEvent(
       {
         maintenance_request_id: request.id,
-        performed_by: userId,
+        performed_by: user.id,
         event_type: "REQUEST_CREATED",
         old_status: null,
         new_status: "REPORTED",
@@ -113,6 +113,33 @@ const createRequest = async (data, userId) => {
       },
       trx
     );
+
+    if (user.role === "CONTRACTOR") {
+      const contractor = await repository.findContractor(
+        user.id,
+        trx
+      );
+
+      await repository.createAssignment(
+        request.id,
+        user.id,
+        trx
+      );
+
+      await repository.createTimelineEvent(
+        {
+          maintenance_request_id: request.id,
+          performed_by: user.id,
+          event_type: "CONTRACTOR_ASSIGNED",
+          old_status: null,
+          new_status: null,
+          note: `Contractor ${
+            contractor?.name || user.id
+          } assigned.`,
+        },
+        trx
+      );
+    }
 
     await trx.commit();
 

@@ -13,13 +13,28 @@ import {
 } from "lucide-react";
 
 import {
+  createMaintenanceRequest,
   getMaintenanceRequests,
   getMaintenanceRequest,
+  getContractors,
+  assignContractor,
+  removeContractor,
+  updateMaintenanceRequest,
+  changeMaintenanceStatus,
+  addTimelineNote,
+  type Contractor,
   type MaintenancePriority,
   type MaintenanceRequest,
   type MaintenanceRequestDetails,
   type MaintenanceStatus,
 } from "../services/maintenance.service";
+import { useAuth } from "../context/AuthContext";
+
+import {
+  getUnits,
+  type Unit,
+} from "../services/units.service";
+import type { User } from "../types/auth";
 
 const statuses: {
   value: MaintenanceStatus | "";
@@ -42,12 +57,49 @@ const priorities: {
   { value: "LOW", label: "Low" },
 ];
 
+const statusTransitions: Record<
+  MaintenanceStatus,
+  MaintenanceStatus[]
+> = {
+  REPORTED: ["TRIAGED"],
+  TRIAGED: ["SCHEDULED"],
+  SCHEDULED: ["RESOLVED"],
+  RESOLVED: ["TRIAGED"],
+};
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function getStatusActionLabel(
+  currentStatus: MaintenanceStatus,
+  nextStatus: MaintenanceStatus
+) {
+  const transitionLabels: Partial<
+    Record<
+      MaintenanceStatus,
+      Partial<Record<MaintenanceStatus, string>>
+    >
+  > = {
+    REPORTED: {
+      TRIAGED: "Move to Triaged",
+    },
+    RESOLVED: {
+      TRIAGED: "Reopen to Triaged",
+    },
+  };
+
+  return (
+    transitionLabels[currentStatus]?.[nextStatus] ??
+    `Move to ${
+      nextStatus.charAt(0) +
+      nextStatus.slice(1).toLowerCase()
+    }`
+  );
 }
 
 function getErrorMessage(error: unknown) {
@@ -111,12 +163,20 @@ function StatusBadge({
 }
 
 export default function MaintenancePage() {
+  const { user } = useAuth();
+  const isManager = user?.role === "MANAGER";
+
   const [requests, setRequests] = useState<
     MaintenanceRequest[]
   >([]);
-
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [unitsLoading, setUnitsLoading] =
+    useState(false);
   const [loading, setLoading] =
     useState(true);
+  
+  const [contractors, setContractors] = useState<Contractor[]>([]);
+  const [contractorsLoading, setContractorsLoading] = useState(false);
 
   const [error, setError] = useState("");
 
@@ -128,6 +188,31 @@ export default function MaintenancePage() {
 
   const [detailsError, setDetailsError] =
   useState("");
+
+  const [assigningContractor, setAssigningContractor] =
+  useState(false);
+  const [updatingRequest, setUpdatingRequest] =
+    useState(false);
+  const [updatingStatus, setUpdatingStatus] =
+    useState(false);
+  const [addingNote, setAddingNote] =
+    useState(false);
+
+  const [showCreateModal, setShowCreateModal] =
+  useState(false);
+
+  const [createSaving, setCreateSaving] =
+    useState(false);
+
+  const [createError, setCreateError] =
+    useState("");
+
+  const [createForm, setCreateForm] = useState({
+    unitId: "",
+    title: "",
+    description: "",
+    priority: "MEDIUM" as MaintenancePriority,
+  });
 
   const [search, setSearch] = useState("");
 
@@ -149,6 +234,42 @@ export default function MaintenancePage() {
 
   const [sortOrder, setSortOrder] =
     useState<"asc" | "desc">("desc");
+
+  const loadUnits = async () => {
+  try {
+    setUnitsLoading(true);
+
+    const response = await getUnits({
+      status: "ACTIVE",
+      page: 1,
+      limit: 100,
+    });
+
+    setUnits(response.data);
+  } catch (err) {
+    setCreateError(getErrorMessage(err));
+  } finally {
+    setUnitsLoading(false);
+  }
+};
+
+const loadContractors = async () => {
+  if (!isManager) {
+    return;
+  }
+
+  try {
+    setContractorsLoading(true);
+
+    const response = await getContractors();
+
+    setContractors(response.data);
+  } catch (err) {
+    setCreateError(getErrorMessage(err));
+  } finally {
+    setContractorsLoading(false);
+  }
+};
 
   const loadRequests = async () => {
     try {
@@ -193,6 +314,23 @@ export default function MaintenancePage() {
     sortOrder,
   ]);
 
+  useEffect(() => {
+  loadUnits();
+  loadContractors();
+}, [isManager]);
+
+  const openCreateModal = () => {
+  setCreateForm({
+    unitId: "",
+    title: "",
+    description: "",
+    priority: "MEDIUM",
+  });
+
+  setCreateError("");
+  setShowCreateModal(true);
+};
+
   const clearFilters = () => {
     setSearch("");
     setStatus("");
@@ -233,6 +371,200 @@ const handleViewRequest = async (
     setDetailsLoading(false);
   }
 };
+const handleAssignContractor = async (
+  contractorId: string
+) => {
+  if (
+    !isManager ||
+    !selectedRequest ||
+    !contractorId
+  ) {
+    return;
+  }
+
+  try {
+    setAssigningContractor(true);
+    setDetailsError("");
+
+    await assignContractor(
+      selectedRequest.id,
+      contractorId
+    );
+
+    const response =
+      await getMaintenanceRequest(
+        selectedRequest.id
+      );
+
+    setSelectedRequest(response.data);
+  } catch (err) {
+    setDetailsError(
+      getErrorMessage(err)
+    );
+  } finally {
+    setAssigningContractor(false);
+  }
+};
+const handleRemoveContractor = async (
+  contractorId: string
+) => {
+  if (!isManager || !selectedRequest) {
+    return;
+  }
+
+  try {
+    setAssigningContractor(true);
+    setDetailsError("");
+
+    await removeContractor(
+      selectedRequest.id,
+      contractorId
+    );
+
+    const response =
+      await getMaintenanceRequest(
+        selectedRequest.id
+      );
+
+    setSelectedRequest(response.data);
+  } catch (err) {
+    setDetailsError(
+      getErrorMessage(err)
+    );
+  } finally {
+    setAssigningContractor(false);
+  }
+};
+const refreshSelectedRequest = async (
+  requestId: string
+) => {
+  const response =
+    await getMaintenanceRequest(requestId);
+
+  setSelectedRequest(response.data);
+};
+
+const handleUpdateRequest = async (payload: {
+  description: string;
+  priority: MaintenancePriority;
+}) => {
+  if (!selectedRequest) {
+    return;
+  }
+
+  if (!payload.description.trim()) {
+    setDetailsError("Description is required.");
+    return;
+  }
+
+  try {
+    setUpdatingRequest(true);
+    setDetailsError("");
+
+    await updateMaintenanceRequest(
+      selectedRequest.id,
+      {
+        description: payload.description.trim(),
+        priority: payload.priority,
+      }
+    );
+
+    await refreshSelectedRequest(selectedRequest.id);
+    await loadRequests();
+  } catch (err) {
+    setDetailsError(getErrorMessage(err));
+  } finally {
+    setUpdatingRequest(false);
+  }
+};
+
+const handleChangeStatus = async (
+  nextStatus: MaintenanceStatus
+) => {
+  if (!selectedRequest) {
+    return;
+  }
+
+  try {
+    setUpdatingStatus(true);
+    setDetailsError("");
+
+    await changeMaintenanceStatus(
+      selectedRequest.id,
+      nextStatus
+    );
+
+    await refreshSelectedRequest(selectedRequest.id);
+    await loadRequests();
+  } catch (err) {
+    setDetailsError(getErrorMessage(err));
+  } finally {
+    setUpdatingStatus(false);
+  }
+};
+
+const handleAddNote = async (note: string) => {
+  if (!selectedRequest || !note.trim()) {
+    setDetailsError("Note cannot be empty.");
+    return;
+  }
+
+  try {
+    setAddingNote(true);
+    setDetailsError("");
+
+    await addTimelineNote(
+      selectedRequest.id,
+      note.trim()
+    );
+
+    await refreshSelectedRequest(selectedRequest.id);
+  } catch (err) {
+    setDetailsError(getErrorMessage(err));
+  } finally {
+    setAddingNote(false);
+  }
+};
+
+const handleCreateRequest = async (
+  event: React.FormEvent
+) => {
+  event.preventDefault();
+
+  if (!createForm.unitId) {
+    setCreateError("Please select a unit.");
+    return;
+  }
+
+  if (!createForm.description.trim()) {
+    setCreateError("Description is required.");
+    return;
+  }
+
+  try {
+    setCreateSaving(true);
+    setCreateError("");
+
+    await createMaintenanceRequest({
+      unitId: createForm.unitId,
+      title:
+        createForm.title.trim() || undefined,
+      description:
+        createForm.description.trim(),
+      priority: createForm.priority,
+    });
+
+    setShowCreateModal(false);
+
+    await loadRequests();
+  } catch (err) {
+    setCreateError(
+      getErrorMessage(err)
+    );
+  } finally {
+    setCreateSaving(false);
+  }
+};
   return (
     <div className="maintenance-page">
       <section className="page-heading">
@@ -252,6 +584,7 @@ const handleViewRequest = async (
         <button
           type="button"
           className="primary-action"
+          onClick={openCreateModal}
         >
           <Plus size={17} />
           New request
@@ -586,11 +919,239 @@ const handleViewRequest = async (
         )}
       </section>
         {selectedRequest && (
-      <MaintenanceDetailsModal
-        request={selectedRequest}
-        onClose={() => setSelectedRequest(null)}
-      />
+     <MaintenanceDetailsModal
+  request={selectedRequest}
+  contractors={contractors}
+  contractorsLoading={contractorsLoading}
+  assigningContractor={assigningContractor}
+  updatingRequest={updatingRequest}
+  updatingStatus={updatingStatus}
+  addingNote={addingNote}
+  error={detailsError}
+  user={user}
+  canManageAssignments={isManager}
+  onAssignContractor={handleAssignContractor}
+  onRemoveContractor={handleRemoveContractor}
+  onUpdateRequest={handleUpdateRequest}
+  onChangeStatus={handleChangeStatus}
+  onAddNote={handleAddNote}
+  onClose={() => setSelectedRequest(null)}
+/>
     )}
+    {showCreateModal && (
+  <CreateMaintenanceModal
+    units={units}
+    unitsLoading={unitsLoading}
+    form={createForm}
+    saving={createSaving}
+    error={createError}
+    onChange={(field, value) =>
+      setCreateForm((current) => ({
+        ...current,
+        [field]: value,
+      }))
+    }
+    onClose={() =>
+      setShowCreateModal(false)
+    }
+    onSubmit={handleCreateRequest}
+  />
+)}
+    </div>
+  );
+}
+
+function CreateMaintenanceModal({
+  units,
+  unitsLoading,
+  form,
+  saving,
+  error,
+  onChange,
+  onClose,
+  onSubmit,
+}: {
+  units: Unit[];
+  unitsLoading: boolean;
+  form: {
+    unitId: string;
+    title: string;
+    description: string;
+    priority: MaintenancePriority;
+  };
+  saving: boolean;
+  error: string;
+  onChange: (
+    field:
+      | "unitId"
+      | "title"
+      | "description"
+      | "priority",
+    value: string
+  ) => void;
+  onClose: () => void;
+  onSubmit: (
+    event: React.FormEvent
+  ) => void;
+}) {
+  return (
+    <div
+      className="maintenance-modal-backdrop"
+      onMouseDown={onClose}
+    >
+      <div
+        className="maintenance-modal maintenance-create-modal"
+        onMouseDown={(event) =>
+          event.stopPropagation()
+        }
+      >
+        <div className="maintenance-modal-header">
+          <div>
+            <p className="eyebrow">
+              Maintenance request
+            </p>
+
+            <h3>New request</h3>
+
+            <p>
+              Create a maintenance request for a
+              property unit.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="maintenance-modal-close"
+            onClick={onClose}
+            title="Close"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <form
+          className="unit-form"
+          onSubmit={onSubmit}
+        >
+          <label>
+            Unit
+
+            <select
+              value={form.unitId}
+              onChange={(event) =>
+                onChange(
+                  "unitId",
+                  event.target.value
+                )
+              }
+              disabled={unitsLoading}
+            >
+              <option value="">
+                {unitsLoading
+                  ? "Loading units..."
+                  : "Select a unit"}
+              </option>
+
+              {units.map((unit) => (
+                <option
+                  key={unit.id}
+                  value={unit.id}
+                >
+                  {unit.unitNumber} —{" "}
+                  {unit.tenantName}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Title
+
+            <input
+              type="text"
+              value={form.title}
+              onChange={(event) =>
+                onChange(
+                  "title",
+                  event.target.value
+                )
+              }
+              placeholder="e.g. Leaking kitchen faucet"
+            />
+          </label>
+
+          <label>
+            Description
+
+            <textarea
+              value={form.description}
+              onChange={(event) =>
+                onChange(
+                  "description",
+                  event.target.value
+                )
+              }
+              placeholder="Describe the maintenance issue..."
+              rows={5}
+            />
+          </label>
+
+          <label>
+            Priority
+
+            <select
+              value={form.priority}
+              onChange={(event) =>
+                onChange(
+                  "priority",
+                  event.target.value
+                )
+              }
+            >
+              <option value="LOW">
+                Low
+              </option>
+
+              <option value="MEDIUM">
+                Medium
+              </option>
+
+              <option value="HIGH">
+                High
+              </option>
+            </select>
+          </label>
+
+          {error && (
+            <div className="form-error">
+              {error}
+            </div>
+          )}
+
+          <div className="modal-actions">
+            <button
+              type="button"
+              className="secondary-action"
+              onClick={onClose}
+              disabled={saving}
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              className="primary-action"
+              disabled={
+                saving || unitsLoading
+              }
+            >
+              {saving
+                ? "Creating..."
+                : "Create request"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
@@ -645,11 +1206,92 @@ function MaintenanceSkeleton() {
 
 function MaintenanceDetailsModal({
   request,
+  contractors,
+  contractorsLoading,
+  assigningContractor,
+  updatingRequest,
+  updatingStatus,
+  addingNote,
+  error,
+  user,
+  canManageAssignments,
+  onAssignContractor,
+  onRemoveContractor,
+  onUpdateRequest,
+  onChangeStatus,
+  onAddNote,
   onClose,
 }: {
   request: MaintenanceRequestDetails;
+  contractors: Contractor[];
+  contractorsLoading: boolean;
+  assigningContractor: boolean;
+  updatingRequest: boolean;
+  updatingStatus: boolean;
+  addingNote: boolean;
+  error: string;
+  user: User | null;
+  canManageAssignments: boolean;
+  onAssignContractor: (
+    contractorId: string
+  ) => void;
+  onRemoveContractor: (
+    contractorId: string
+  ) => void;
+  onUpdateRequest: (payload: {
+    description: string;
+    priority: MaintenancePriority;
+  }) => void;
+  onChangeStatus: (
+    status: MaintenanceStatus
+  ) => void;
+  onAddNote: (note: string) => void;
   onClose: () => void;
 }) {
+  const [isEditing, setIsEditing] =
+    useState(false);
+  const [editForm, setEditForm] = useState({
+    description: request.description,
+    priority: request.priority,
+  });
+  const [note, setNote] = useState("");
+
+  useEffect(() => {
+    setEditForm({
+      description: request.description,
+      priority: request.priority,
+    });
+    setNote("");
+    setIsEditing(false);
+  }, [
+    request.id,
+    request.description,
+    request.priority,
+    request.status,
+  ]);
+
+  const canChangeStatus =
+    user?.role === "MANAGER" ||
+    (user?.role === "CONTRACTOR" &&
+      request.contractors.some(
+        (contractor) => contractor.id === user.id
+      ));
+
+  const availableStatuses = canChangeStatus
+    ? statusTransitions[request.status].filter(
+        (status) =>
+          status !== "SCHEDULED" ||
+          request.contractors.length > 0
+      )
+    : [];
+
+  const saveDisabled =
+    updatingRequest ||
+    !editForm.description.trim() ||
+    (editForm.description.trim() ===
+      request.description &&
+      editForm.priority === request.priority);
+
   return (
     <div
       className="maintenance-modal-backdrop"
@@ -685,6 +1327,13 @@ function MaintenanceDetailsModal({
         </div>
 
         <div className="maintenance-modal-body">
+          {error && (
+            <div className="maintenance-error maintenance-modal-error">
+              <AlertCircle size={16} />
+              <span>{error}</span>
+            </div>
+          )}
+
           <div className="maintenance-detail-badges">
             <PriorityBadge
               priority={request.priority}
@@ -726,57 +1375,286 @@ function MaintenanceDetailsModal({
           </div>
 
           <div className="maintenance-detail-section">
-            <h4>Description</h4>
+            <div className="maintenance-section-heading">
+              <h4>Description</h4>
 
-            <p className="maintenance-description">
-              {request.description}
-            </p>
-          </div>
+              <button
+                type="button"
+                className="secondary-action maintenance-inline-action"
+                onClick={() => {
+                  setIsEditing((current) => !current);
+                  setEditForm({
+                    description: request.description,
+                    priority: request.priority,
+                  });
+                }}
+                disabled={updatingRequest}
+              >
+                {isEditing ? "Cancel" : "Edit request"}
+              </button>
+            </div>
 
-          <div className="maintenance-detail-section">
-            <h4>
-              Contractors
-              <span>
-                {request.contractors.length}
-              </span>
-            </h4>
+            {isEditing ? (
+              <form
+                className="maintenance-edit-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  onUpdateRequest(editForm);
+                }}
+              >
+                <label>
+                  Description
 
-            {request.contractors.length === 0 ? (
-              <p className="maintenance-muted">
-                No contractors assigned.
-              </p>
+                  <textarea
+                    value={editForm.description}
+                    onChange={(event) =>
+                      setEditForm((current) => ({
+                        ...current,
+                        description:
+                          event.target.value,
+                      }))
+                    }
+                    rows={5}
+                    disabled={updatingRequest}
+                  />
+                </label>
+
+                <label>
+                  Priority
+
+                  <select
+                    value={editForm.priority}
+                    onChange={(event) =>
+                      setEditForm((current) => ({
+                        ...current,
+                        priority: event.target
+                          .value as MaintenancePriority,
+                      }))
+                    }
+                    disabled={updatingRequest}
+                  >
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                  </select>
+                </label>
+
+                <div className="modal-actions">
+                  <button
+                    type="button"
+                    className="secondary-action"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditForm({
+                        description:
+                          request.description,
+                        priority: request.priority,
+                      });
+                    }}
+                    disabled={updatingRequest}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="primary-action"
+                    disabled={saveDisabled}
+                  >
+                    {updatingRequest
+                      ? "Saving..."
+                      : "Save changes"}
+                  </button>
+                </div>
+              </form>
             ) : (
-              <div className="maintenance-contractors">
-                {request.contractors.map(
-                  (contractor) => (
-                    <div
-                      className="maintenance-contractor"
-                      key={contractor.id}
-                    >
-                      <div className="maintenance-avatar">
-                        {contractor.name
-                          .charAt(0)
-                          .toUpperCase()}
-                      </div>
-
-                      <div>
-                        <strong>
-                          {contractor.name}
-                        </strong>
-
-                        <span>
-                          {contractor.email}
-                        </span>
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
+              <p className="maintenance-description">
+                {request.description}
+              </p>
             )}
           </div>
 
+          {canChangeStatus && (
           <div className="maintenance-detail-section">
-            <h4>Timeline</h4>
+            <div className="maintenance-section-heading">
+              <h4>Status</h4>
+
+              <span className="maintenance-section-hint">
+                Current status is{" "}
+                {request.status.toLowerCase()}
+              </span>
+            </div>
+
+            <div className="maintenance-status-row">
+              {availableStatuses.length === 0 ? (
+                <span className="maintenance-section-hint">
+                  {request.status === "TRIAGED" &&
+                  request.contractors.length === 0
+                    ? "Assign a contractor before scheduling."
+                    : "No status transitions available."}
+                </span>
+              ) : (
+                availableStatuses.map((status) => (
+                  <button
+                    type="button"
+                    className="primary-action"
+                    key={status}
+                    onClick={() => onChangeStatus(status)}
+                    disabled={updatingStatus}
+                  >
+                    {updatingStatus
+                      ? "Updating..."
+                      : getStatusActionLabel(
+                          request.status,
+                          status
+                        )}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+          )}
+
+          <div className="maintenance-detail-section">
+  <div className="maintenance-section-heading">
+    <h4>
+      Contractors
+      <span>
+        {request.contractors.length}
+      </span>
+    </h4>
+
+    <span className="maintenance-section-hint">
+      {request.contractors.length === 0
+        ? "No one assigned yet"
+        : `${request.contractors.length} assigned`}
+    </span>
+  </div>
+
+  {request.contractors.length > 0 && (
+    <div className="maintenance-contractors">
+      {request.contractors.map((contractor) => (
+        <div
+          className="maintenance-contractor"
+          key={contractor.id}
+        >
+          <div className="maintenance-avatar">
+            {contractor.name
+              .charAt(0)
+              .toUpperCase()}
+          </div>
+
+          <div className="maintenance-contractor-info">
+            <strong>{contractor.name}</strong>
+
+            <span>{contractor.email}</span>
+          </div>
+
+          {canManageAssignments && (
+            <button
+              type="button"
+              className="maintenance-contractor-remove"
+              onClick={() =>
+                onRemoveContractor(contractor.id)
+              }
+              disabled={assigningContractor}
+              title="Remove contractor"
+            >
+              <X size={15} />
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  )}
+
+  {canManageAssignments && (
+  <div className="maintenance-assign-row">
+    <select
+      defaultValue=""
+      disabled={
+        contractorsLoading ||
+        assigningContractor
+      }
+      onChange={(event) => {
+        if (event.target.value) {
+          onAssignContractor(
+            event.target.value
+          );
+
+          event.target.value = "";
+        }
+      }}
+    >
+      <option value="">
+        {contractorsLoading
+          ? "Loading contractors..."
+          : "Select contractor to assign"}
+      </option>
+
+      {contractors
+        .filter(
+          (contractor) =>
+            !request.contractors.some(
+              (assigned) =>
+                assigned.id === contractor.id
+            )
+        )
+        .map((contractor) => (
+          <option
+            key={contractor.id}
+            value={contractor.id}
+          >
+            {contractor.name} —{" "}
+            {contractor.email}
+          </option>
+        ))}
+    </select>
+
+    {assigningContractor && (
+      <span className="maintenance-assign-loading">
+        Updating...
+      </span>
+    )}
+  </div>
+  )}
+</div>
+
+          <div className="maintenance-detail-section">
+            <div className="maintenance-section-heading">
+              <h4>Timeline</h4>
+            </div>
+
+            <form
+              className="maintenance-note-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                onAddNote(note);
+                setNote("");
+              }}
+            >
+              <textarea
+                value={note}
+                onChange={(event) =>
+                  setNote(event.target.value)
+                }
+                placeholder="Add a timeline note..."
+                rows={3}
+                disabled={addingNote}
+              />
+
+              <button
+                type="submit"
+                className="secondary-action"
+                disabled={
+                  addingNote || !note.trim()
+                }
+              >
+                {addingNote
+                  ? "Adding..."
+                  : "Add note"}
+              </button>
+            </form>
 
             {request.timeline.length === 0 ? (
               <p className="maintenance-muted">

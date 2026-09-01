@@ -211,3 +211,8 @@ export type MaintenanceTimelineEvent = {
   created_at: string;
 };
 
+export async function getContractors() {
+  return api<{
+    data: Contractor[];
+  }>("/users/contractors");
+}

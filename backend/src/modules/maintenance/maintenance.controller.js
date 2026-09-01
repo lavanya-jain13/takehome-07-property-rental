@@ -35,10 +35,10 @@ const handleError = (res, error) => {
     INVALID_STATUS_TRANSITION: [
       400,
       "INVALID_STATUS_TRANSITION",
-      "Invalid status transition.",
+      "Status must follow REPORTED -> TRIAGED -> SCHEDULED -> RESOLVED, or RESOLVED -> TRIAGED when reopening.",
     ],
     CONTRACTOR_REQUIRED_FOR_SCHEDULE: [
-      409,
+      400,
       "CONTRACTOR_REQUIRED_FOR_SCHEDULE",
       "At least one contractor must be assigned before scheduling.",
     ],
@@ -128,7 +128,7 @@ const create = async (req, res) => {
   try {
     const request = await maintenanceService.createRequest(
       req.body,
-      req.user.id
+      req.user
     );
 
     return res.status(201).json({

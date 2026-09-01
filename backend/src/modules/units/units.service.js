@@ -1,6 +1,9 @@
 const repository = require("./units.repository");
 
-const listUnits = async ({ status, page = 1, limit = 20 }) => {
+const listUnits = async (
+  { status, page = 1, limit = 20 },
+  user
+) => {
   const validStatuses = ["ACTIVE", "ARCHIVED"];
 
   if (status && !validStatuses.includes(status)) {
@@ -18,14 +21,27 @@ const listUnits = async ({ status, page = 1, limit = 20 }) => {
     throw new Error("INVALID_LIMIT");
   }
 
+  const isContractor = user?.role === "CONTRACTOR";
+  const effectiveStatus = isContractor ? "ACTIVE" : status;
+
   const result = await repository.findAll({
-    status,
+    status: effectiveStatus,
     page,
     limit,
+    fields: isContractor
+      ? [
+          "id",
+          "unit_number",
+          "address",
+          "tenant_name",
+        ]
+      : undefined,
   });
 
   return {
-    data: result.units.map(formatUnit),
+    data: result.units.map(
+      isContractor ? formatContractorUnit : formatUnit
+    ),
     pagination: {
       page,
       limit,
@@ -175,6 +191,13 @@ const formatUnit = (unit) => ({
   status: unit.status,
   createdAt: unit.created_at,
   updatedAt: unit.updated_at,
+});
+
+const formatContractorUnit = (unit) => ({
+  id: unit.id,
+  unitNumber: unit.unit_number,
+  address: unit.address,
+  tenantName: unit.tenant_name,
 });
 
 const formatMaintenanceRequest = (request) => ({

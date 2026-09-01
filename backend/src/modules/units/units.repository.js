@@ -1,7 +1,12 @@
 const db = require("../../config/database");
 
-const findAll = async ({ status, page, limit }) => {
-  const query = db("units").select("*");
+const findAll = async ({
+  status,
+  page,
+  limit,
+  fields = ["*"],
+}) => {
+  const query = db("units").select(fields);
 
   if (status) {
     query.where("status", status);
