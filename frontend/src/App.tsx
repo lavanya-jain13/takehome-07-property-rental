@@ -11,6 +11,7 @@ import AppLayout from "./layouts/AppLayout";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import UnitsPage from "./pages/UnitsPage";  
+import MaintenancePage from "./pages/MaintenancePage";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -43,15 +44,13 @@ function App() {
           /> */}
 
           <Route
-  path="/units"
-  element={<UnitsPage />}
-/>
+            path="/units"
+            element={<UnitsPage />}
+          />
 
           <Route
             path="/maintenance"
-            element={
-              <div>Maintenance coming next.</div>
-            }
+            element={<MaintenancePage />}
           />
 
           <Route
