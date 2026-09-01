@@ -12,6 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import UnitsPage from "./pages/UnitsPage";  
 import MaintenancePage from "./pages/MaintenancePage";
+import RentPage from "./pages/RentPage";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -55,9 +56,7 @@ function App() {
 
           <Route
             path="/rent"
-            element={
-              <div>Rent coming next.</div>
-            }
+            element={<RentPage />}
           />
 
           <Route
