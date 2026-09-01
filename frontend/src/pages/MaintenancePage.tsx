@@ -216,11 +216,16 @@ export default function MaintenancePage() {
 
   const [search, setSearch] = useState("");
 
+  const [unitId, setUnitId] = useState("");
+
   const [status, setStatus] =
     useState<MaintenanceStatus | "">("");
 
   const [priority, setPriority] =
     useState<MaintenancePriority | "">("");
+
+  const [contractorId, setContractorId] =
+    useState("");
 
   const [page, setPage] = useState(1);
 
@@ -229,7 +234,7 @@ export default function MaintenancePage() {
     useState(1);
 
   const [sortBy, setSortBy] = useState<
-    "createdAt" | "updatedAt" | "priority" | "status"
+    "createdAt" | "priority" | "status"
   >("createdAt");
 
   const [sortOrder, setSortOrder] =
@@ -279,8 +284,13 @@ const loadContractors = async () => {
       const response =
         await getMaintenanceRequests({
           search: search.trim() || undefined,
+          unitId: unitId || undefined,
           status: status || undefined,
           priority: priority || undefined,
+          contractorId:
+            isManager && contractorId
+              ? contractorId
+              : undefined,
           page,
           limit: 10,
           sortBy,
@@ -307,11 +317,14 @@ const loadContractors = async () => {
     return () => clearTimeout(timeout);
   }, [
     search,
+    unitId,
     status,
     priority,
+    contractorId,
     page,
     sortBy,
     sortOrder,
+    isManager,
   ]);
 
   useEffect(() => {
@@ -333,15 +346,16 @@ const loadContractors = async () => {
 
   const clearFilters = () => {
     setSearch("");
+    setUnitId("");
     setStatus("");
     setPriority("");
+    setContractorId("");
     setPage(1);
   };
 
   const handleSort = (
     field:
       | "createdAt"
-      | "updatedAt"
       | "priority"
       | "status"
   ) => {
@@ -353,6 +367,8 @@ const loadContractors = async () => {
       setSortBy(field);
       setSortOrder("desc");
     }
+
+    setPage(1);
   };
 const handleViewRequest = async (
   requestId: string
@@ -634,7 +650,7 @@ const handleCreateRequest = async (
                 setSearch(event.target.value);
                 setPage(1);
               }}
-              placeholder="Search requests or units..."
+              placeholder="Search descriptions..."
             />
 
             {search && (
@@ -650,6 +666,32 @@ const handleCreateRequest = async (
           </div>
 
           <div className="maintenance-filters">
+            <div className="select-wrapper">
+              <select
+                value={unitId}
+                onChange={(event) => {
+                  setUnitId(event.target.value);
+                  setPage(1);
+                }}
+                disabled={unitsLoading}
+              >
+                <option value="">
+                  {unitsLoading
+                    ? "Loading units..."
+                    : "All units"}
+                </option>
+
+                {units.map((unit) => (
+                  <option
+                    key={unit.id}
+                    value={unit.id}
+                  >
+                    {unit.unitNumber}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="select-wrapper">
               <Filter size={14} />
 
@@ -696,9 +738,39 @@ const handleCreateRequest = async (
               </select>
             </div>
 
+            {isManager && (
+              <div className="select-wrapper">
+                <select
+                  value={contractorId}
+                  onChange={(event) => {
+                    setContractorId(event.target.value);
+                    setPage(1);
+                  }}
+                  disabled={contractorsLoading}
+                >
+                  <option value="">
+                    {contractorsLoading
+                      ? "Loading contractors..."
+                      : "All contractors"}
+                  </option>
+
+                  {contractors.map((contractor) => (
+                    <option
+                      key={contractor.id}
+                      value={contractor.id}
+                    >
+                      {contractor.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {(search ||
+              unitId ||
               status ||
-              priority) && (
+              priority ||
+              contractorId) && (
               <button
                 type="button"
                 className="clear-filter-button"
@@ -732,8 +804,10 @@ const handleCreateRequest = async (
             hasFilters={
               !!(
                 search ||
+                unitId ||
                 status ||
-                priority
+                priority ||
+                contractorId
               )
             }
             onClear={clearFilters}

@@ -68,7 +68,7 @@ export async function getMaintenanceRequests(params?: {
   search?: string;
   page?: number;
   limit?: number;
-  sortBy?: "createdAt" | "updatedAt" | "priority" | "status";
+  sortBy?: "createdAt" | "created" | "priority" | "status";
   sortOrder?: "asc" | "desc";
 }) {
   const query = new URLSearchParams();

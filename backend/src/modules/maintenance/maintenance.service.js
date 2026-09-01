@@ -2,11 +2,19 @@ const db = require("../../config/database");
 const repository = require("./maintenance.repository");
 
 const {
+  VALID_PRIORITIES,
   validateCreateRequest,
   validateUpdateRequest,
   validateStatus,
   isValidStatusTransition,
 } = require("./maintenance.validation");
+
+const VALID_SORT_FIELDS = [
+  "created",
+  "createdAt",
+  "priority",
+  "status",
+];
 
 const listRequests = async ({
   userId,
@@ -36,6 +44,18 @@ const listRequests = async ({
     validateStatus(status);
   }
 
+  if (
+    priority &&
+    !VALID_PRIORITIES.includes(priority)
+  ) {
+    throw new Error("INVALID_PRIORITY");
+  }
+
+  const normalizedSortBy =
+    VALID_SORT_FIELDS.includes(sortBy)
+      ? sortBy
+      : "createdAt";
+
   const result = await repository.findAll({
     userId,
     role,
@@ -43,10 +63,10 @@ const listRequests = async ({
     status,
     priority,
     contractorId,
-    search,
+    search: search?.trim(),
     page,
     limit,
-    sortBy,
+    sortBy: normalizedSortBy,
     sortOrder: sortOrder === "asc" ? "asc" : "desc",
   });
 

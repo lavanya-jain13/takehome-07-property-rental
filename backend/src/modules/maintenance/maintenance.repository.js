@@ -127,21 +127,10 @@ const findAll = async ({
   }
 
   if (search) {
-    query.where((builder) => {
-      builder
-        .whereILike(
-          "maintenance_requests.title",
-          `%${search}%`
-        )
-        .orWhereILike(
-          "maintenance_requests.description",
-          `%${search}%`
-        )
-        .orWhereILike(
-          "units.unit_number",
-          `%${search}%`
-        );
-    });
+    query.whereILike(
+      "maintenance_requests.description",
+      `%${search}%`
+    );
   }
 
   const countQuery = query
@@ -153,8 +142,8 @@ const findAll = async ({
   const [{ count }] = await countQuery;
 
   const allowedSortFields = {
+    created: "maintenance_requests.created_at",
     createdAt: "maintenance_requests.created_at",
-    updatedAt: "maintenance_requests.updated_at",
     priority: "maintenance_requests.priority",
     status: "maintenance_requests.status",
   };
@@ -163,13 +152,15 @@ const findAll = async ({
     allowedSortFields[sortBy] ||
     "maintenance_requests.created_at";
 
-  const units = await query
+  const requests = await query
     .orderBy(sortColumn, sortOrder)
+    .orderBy("maintenance_requests.created_at", "desc")
+    .orderBy("maintenance_requests.id", "asc")
     .limit(limit)
     .offset((page - 1) * limit);
 
   return {
-    requests: units,
+    requests,
     total: Number(count),
   };
 };
