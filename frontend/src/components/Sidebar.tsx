@@ -1,6 +1,6 @@
 import {
   LayoutDashboard,
-  Building2,
+//   Building2,
   Home,
   Wrench,
   IndianRupee,
@@ -16,11 +16,11 @@ const navigation = [
     path: "/dashboard",
     icon: LayoutDashboard,
   },
-  {
-    label: "Properties",
-    path: "/properties",
-    icon: Building2,
-  },
+//   {
+//     label: "Properties",
+//     path: "/properties",
+//     icon: Building2,
+//   },
   {
     label: "Units",
     path: "/units",

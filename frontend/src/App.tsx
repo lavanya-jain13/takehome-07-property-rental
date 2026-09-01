@@ -10,6 +10,7 @@ import AppLayout from "./layouts/AppLayout";
 
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
+import UnitsPage from "./pages/UnitsPage";  
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -33,20 +34,18 @@ function App() {
             path="/dashboard"
             element={<DashboardPage />}
           />
-
+{/* 
           <Route
             path="/properties"
             element={
               <div>Properties coming next.</div>
             }
-          />
+          /> */}
 
           <Route
-            path="/units"
-            element={
-              <div>Units coming next.</div>
-            }
-          />
+  path="/units"
+  element={<UnitsPage />}
+/>
 
           <Route
             path="/maintenance"

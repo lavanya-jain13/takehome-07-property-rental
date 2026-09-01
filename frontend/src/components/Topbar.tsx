@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
-  "/properties": "Properties",
+//   "/properties": "Properties",
   "/units": "Units",
   "/maintenance": "Maintenance",
   "/rent": "Rent",
