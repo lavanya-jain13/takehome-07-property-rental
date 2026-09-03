@@ -1,9 +1,10 @@
-# Submission
+# Property Rental & Maintenance System — Submission
 
 ## Links
 
-- **GitHub repository:** <public repo URL>
-- **Live application:** <deployed URL>
+- **GitHub repository:** https://github.com/lavanya-jain13/takehome-07-property-rental
+- **Live application:** https://takehome-07-property-rental.vercel.app
+- **Backend API:** https://takehome-07-property-rental.onrender.com
 
 ## Notes for the reviewer
 
@@ -15,15 +16,20 @@ the full application. The contractor account demonstrates the restricted
 maintenance workflow and server-side access controls.
 
 The application uses session-based authentication through an HTTP-only cookie.
-The frontend and backend are separate applications and may be hosted
-independently.
+The frontend and backend are deployed as separate applications, with the
+frontend hosted on Vercel and the backend hosted on Render.
+
+The production database is PostgreSQL hosted on Supabase.
 
 ## Demo credentials
 
 | Role | Email | Password |
 |------|-------|----------|
-| Manager | <manager demo email> | <manager demo password> |
-| Contractor | <contractor demo email> | <contractor demo password> |
+| Manager | manager@example.com | Password123! |
+| Contractor | contractor@example.com | Password123! |
+
+> These credentials are provided specifically for evaluation of the deployed
+> application.
 
 ## Stack
 
@@ -31,8 +37,147 @@ independently.
 |-------|---------------|-----|
 | Frontend | React, TypeScript, Vite, Lucide React | Component-based UI with type safety and fast development |
 | Backend | Node.js, Express, Knex | Lightweight API server with modular business logic and database access |
-| Database | PostgreSQL | Relational data model, constraints, transactions, and reliable persistence |
-| Hosting | <hosting platform(s)> | Simple deployment of the frontend, backend, and database |
+| Database | PostgreSQL, Supabase | Relational data model, constraints, transactions, and reliable persistence |
+| Authentication | HTTP-only cookies, JWT | Secure session handling without exposing authentication tokens to client-side JavaScript |
+| Frontend Hosting | Vercel | Simple and reliable deployment for the React/Vite application |
+| Backend Hosting | Render | Simple deployment for the Node.js/Express API |
+| Database Hosting | Supabase | Managed PostgreSQL database suitable for the application's relational workload |
+
+## Goal checklist
+
+| # | Goal | Status | Notes |
+|---|------|--------|-------|
+| 1 | Accounts and roles | Done | Manager and contractor authentication with server-side role enforcement |
+| 2 | Units and rent | Done | Unit CRUD, archive/restore, monthly rent, tenant information, and rent recording |
+| 3 | Maintenance requests | Done | Request creation/editing, priorities, unit association, and contractor assignments |
+| 4 | Maintenance lifecycle | Done | Server-enforced `REPORTED → TRIAGED → SCHEDULED → RESOLVED` lifecycle with reopening support |
+| 5 | Contractor assignment | Done | Multiple contractors can be assigned to a request; contractors only access assigned requests |
+| 6 | Finding requests | Done | Server-side search, filters, sorting, pagination, and total match count |
+| 7 | Bulk rent | Done | Individual and bulk rent recording with matched, underpaid, overpaid, and unmatched results |
+| 8 | Dashboard | Done | Open maintenance, overdue rent, resolved-this-week, collection metrics, and maintenance/reporting views |
+| 9 | Immutable maintenance history | Done | Request creation, status changes, assignments, unassignments, and notes are recorded as timeline events |
+| 10 | Rent alerts | Done | Grace-period-based overdue alerts, manager dismissal, navigation count, and month-specific alert handling |
+
+## Security and authorization
+
+Authorization is enforced on the backend rather than relying only on
+frontend route visibility.
+
+Managers can:
+
+- Manage units
+- Archive and restore units
+- Create and manage maintenance requests
+- Assign and remove contractors
+- Record individual and bulk rent payments
+- View rent information
+- View rent alerts
+- Access dashboard and reporting data
+
+Contractors can:
+
+- View maintenance requests assigned to them
+- Create maintenance requests
+- Edit maintenance request descriptions and priorities
+- Update the lifecycle status of requests they are assigned to
+
+Contractors cannot:
+
+- Create, edit, archive, or restore units
+- View rent information
+- Record rent payments
+- Assign or remove contractors
+- Access manager-only dashboard and rent functionality
+
+These restrictions are also enforced server-side, so directly calling protected
+API endpoints does not bypass authorization.
+
+## Maintenance workflow
+
+Maintenance requests follow an explicit server-enforced lifecycle:
+
+`REPORTED → TRIAGED → SCHEDULED → RESOLVED`
+
+A request can also be reopened:
+
+`RESOLVED → TRIAGED`
+
+The backend rejects invalid state transitions and prevents a request from being
+moved to `SCHEDULED` unless at least one contractor is assigned.
+
+Maintenance history is append-only at the application level and records:
+
+- Request creation
+- Status changes with old and new status
+- Contractor assignments
+- Contractor removals
+- Notes
+- Acting user
+- Timestamp
+
+## Rent management
+
+The rent module supports:
+
+- Individual rent payment recording
+- Bulk rent recording for a month
+- Matched payments
+- Underpaid payments
+- Overpaid payments
+- Unmatched payments
+- Rent payment history
+- Current rent roll
+- CSV rent-roll export
+- Grace-period-based rent alerts
+- Manager dismissal of alerts
+
+Rent alerts are associated with a specific `unit + rent_month`, allowing the
+same unit to generate a new alert in a later month if the rent remains
+unmatched.
+
+## Search, filtering and pagination
+
+Maintenance requests support server-side:
+
+- Text search over request descriptions
+- Unit filtering
+- Status filtering
+- Priority filtering
+- Contractor filtering
+- Sorting by creation time, priority, or status
+- Pagination
+- Total match count
+
+Contractor results are additionally restricted server-side to requests assigned
+to the authenticated contractor.
+
+## Production deployment
+
+The application is deployed as three separate components:
+
+```text
+                    ┌──────────────────────────┐
+                    │          Vercel          │
+                    │     React + TypeScript   │
+                    │        Frontend          │
+                    └────────────┬─────────────┘
+                                 │
+                              HTTPS
+                                 │
+                                 ▼
+                    ┌──────────────────────────┐
+                    │          Render          │
+                    │      Node + Express      │
+                    │        Backend API       │
+                    └────────────┬─────────────┘
+                                 │
+                              PostgreSQL
+                                 │
+                                 ▼
+                    ┌──────────────────────────┐
+                    │         Supabase         │
+                    │       PostgreSQL DB      │
+                    └──────────────────────────┘
 
 ## Goal checklist
 
@@ -51,10 +196,12 @@ independently.
 
 ## How much time did you actually spend?
 
-<Add the actual total development time here.>
+I did not track development time precisely, so I do not want to provide
+an inaccurate number.
 
 The time included implementation, debugging, integration testing, role-based
-security verification, UI refinement, and final documentation.
+security verification, UI refinement, deployment, production configuration,
+and final documentation.
 
 ## What would you do next, with another 12 hours?
 
