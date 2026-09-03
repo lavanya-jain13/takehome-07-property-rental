@@ -180,18 +180,9 @@ const getAlerts = async () => {
       continue;
     }
 
-    const dismissedAt = unit.dismissed_at
-      ? new Date(unit.dismissed_at)
-      : null;
-
-    const dismissedRecently =
-      dismissedAt &&
-      now.getTime() - dismissedAt.getTime() <
-        24 * 60 * 60 * 1000;
-
-    if (dismissedRecently) {
-      continue;
-    }
+ if (unit.dismissal_id) {
+  continue;
+}
 
     alerts.push({
       unitId: unit.id,

@@ -2,6 +2,7 @@ import { api } from "./api";
 import type {
   LoginRequest,
   LoginResponse,
+  User,
 } from "../types/auth";
 
 export async function login(
@@ -11,4 +12,8 @@ export async function login(
     method: "POST",
     body: credentials,
   });
+}
+
+export async function getCurrentUser() {
+  return api<{ user: User }>("/auth/me");
 }

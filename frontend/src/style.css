@@ -3094,3 +3094,748 @@ input {
   color: var(--muted);
   white-space: nowrap;
 }
+
+/* Rent alerts */
+.rent-alerts-page {
+  width: 100%;
+}
+
+.rent-alerts-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.rent-alerts-error button {
+  border: 0;
+  background: transparent;
+  color: #b91c1c;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.alerts-summary {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 18px;
+  padding: 17px 19px;
+  border: 1px solid #e5ebf3;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.alerts-summary-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.alerts-summary span {
+  display: block;
+  margin-bottom: 4px;
+  color: #8491a5;
+  font-size: 12px;
+}
+
+.alerts-summary strong {
+  display: block;
+  color: #172033;
+  font-size: 20px;
+}
+
+.rent-alerts-list {
+  display: grid;
+  gap: 16px;
+}
+
+.rent-alert-card {
+  overflow: hidden;
+  border: 1px solid #e5ebf3;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.rent-alert-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 22px;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.rent-alert-unit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rent-alert-unit strong {
+  color: #172033;
+  font-size: 16px;
+}
+
+.rent-alert-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rent-alert-badge span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+.rent-alert-tenant {
+  margin: 8px 0 3px;
+  color: #29364b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rent-alert-address {
+  margin: 0;
+  color: #8793a7;
+  font-size: 12px;
+}
+
+.rent-alert-month {
+  min-width: 120px;
+  text-align: right;
+}
+
+.rent-alert-month span,
+.rent-alert-meta span,
+.rent-alert-financials span {
+  display: block;
+  margin-bottom: 5px;
+  color: #8793a7;
+  font-size: 11px;
+}
+
+.rent-alert-month strong {
+  color: #29364b;
+  font-size: 13px;
+}
+
+.rent-alert-financials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin: 0;
+  background: #edf1f6;
+}
+
+.rent-alert-financials > div {
+  padding: 17px 22px;
+  background: #fff;
+}
+
+.rent-alert-financials strong {
+  display: block;
+  color: #172033;
+  font-size: 16px;
+}
+
+.rent-alert-financials .rent-alert-outstanding {
+  color: #dc2626;
+}
+
+.rent-alert-meta {
+  display: flex;
+  gap: 40px;
+  padding: 15px 22px;
+  border-bottom: 1px solid #edf1f6;
+  background: #fafbfd;
+}
+
+.rent-alert-meta strong {
+  color: #4e5c73;
+  font-size: 12px;
+}
+
+.rent-alert-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 22px;
+}
+
+.rent-alert-warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a16207;
+  font-size: 12px;
+}
+
+.rent-alert-warning svg {
+  flex: 0 0 auto;
+}
+
+.rent-alert-card-footer .secondary-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.rent-alerts-empty {
+  padding: 75px 20px;
+  border: 1px solid #e5ebf3;
+  border-radius: 13px;
+  background: #fff;
+  text-align: center;
+}
+
+.rent-alerts-empty-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: #ecfdf3;
+  color: #16a34a;
+}
+
+.rent-alerts-empty h3 {
+  margin: 0 0 7px;
+  color: #172033;
+  font-size: 16px;
+}
+
+.rent-alerts-empty p {
+  max-width: 420px;
+  margin: 0 auto;
+  color: #8a97aa;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.rent-alerts-skeleton {
+  display: grid;
+  gap: 16px;
+}
+
+.rent-alert-skeleton-card {
+  display: grid;
+  gap: 14px;
+  min-height: 190px;
+  padding: 22px;
+  border: 1px solid #e5ebf3;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.rent-alert-skeleton-card span {
+  display: block;
+  height: 14px;
+  border-radius: 5px;
+  background: #edf1f5;
+}
+
+.rent-alert-skeleton-card span:first-child {
+  width: 35%;
+  height: 18px;
+}
+
+.rent-alert-skeleton-card span:nth-child(2) {
+  width: 25%;
+}
+
+.rent-alert-skeleton-card span:nth-child(3) {
+  width: 70%;
+}
+
+.rent-alert-skeleton-card span:nth-child(4) {
+  width: 45%;
+}
+
+@media (max-width: 700px) {
+  .rent-alert-card-header {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .rent-alert-month {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .rent-alert-financials {
+    grid-template-columns: 1fr;
+  }
+
+  .rent-alert-meta {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .rent-alert-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rent-alert-card-footer .secondary-action {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.nav-alert-count {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Login page */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(37, 99, 235, 0.08),
+      transparent 32%
+    ),
+    #f5f7fb;
+}
+
+.login-shell {
+  width: min(1080px, 100%);
+  min-height: 650px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.1),
+    0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+/* Left showcase */
+.login-showcase {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 42px;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(96, 165, 250, 0.25),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #102a56 0%,
+      #173f7a 52%,
+      #2563a9 100%
+    );
+  color: #fff;
+}
+
+.login-showcase::before {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  right: -120px;
+  bottom: -100px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+}
+
+.login-showcase::after {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  right: -230px;
+  bottom: -170px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.login-brand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.login-brand-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+
+.login-showcase-content {
+  position: relative;
+  z-index: 1;
+  max-width: 470px;
+  margin: auto 0;
+}
+
+.login-eyebrow {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #bfdbfe;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+}
+
+.login-showcase h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(34px, 4vw, 48px);
+  font-weight: 750;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.login-showcase h1 span {
+  color: #bfdbfe;
+}
+
+.login-showcase-content > p {
+  max-width: 440px;
+  margin: 20px 0 34px;
+  color: #dbeafe;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.login-features {
+  display: grid;
+  gap: 14px;
+}
+
+.login-feature {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.login-feature-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.09);
+  color: #dbeafe;
+}
+
+.login-feature strong,
+.login-feature span {
+  display: block;
+}
+
+.login-feature strong {
+  margin-bottom: 3px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.login-feature span {
+  color: #bfdbfe;
+  font-size: 11px;
+}
+
+.login-showcase-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #bfdbfe;
+  font-size: 11px;
+}
+
+/* Right panel */
+.login-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 56px;
+  background: #fff;
+}
+
+.login-card {
+  width: min(370px, 100%);
+}
+
+.login-mobile-brand {
+  display: none;
+}
+
+.login-header {
+  margin-bottom: 30px;
+}
+
+.login-welcome {
+  display: block;
+  margin-bottom: 9px;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.login-header h2 {
+  margin: 0 0 10px;
+  color: #172033;
+  font-size: 28px;
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.login-header p {
+  margin: 0;
+  color: #7d8aa0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.login-form {
+  display: grid;
+  gap: 19px;
+}
+
+.login-field {
+  display: grid;
+  gap: 8px;
+}
+
+.login-field label {
+  color: #29364b;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.login-field input {
+  width: 100%;
+  height: 46px;
+  box-sizing: border-box;
+  padding: 0 13px;
+  border: 1px solid #dce4ee;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  font-size: 13px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.login-field input::placeholder {
+  color: #a2adbc;
+}
+
+.login-field input:focus {
+  border-color: #6ea0ef;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.login-form button {
+  width: 100%;
+  height: 47px;
+  margin-top: 3px;
+  border: 0;
+  border-radius: 9px;
+  background: #2563eb;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 5px 12px rgba(37, 99, 235, 0.2);
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.login-form button:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 7px 16px rgba(37, 99, 235, 0.25);
+}
+
+.login-form button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-form button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-security-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 24px 0 0;
+  color: #94a0b2;
+  font-size: 11px;
+}
+
+/* Existing error class gets a cleaner login treatment */
+.login-form .form-error {
+  margin: -5px 0 -3px;
+  padding: 10px 11px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 850px) {
+  .login-page {
+    padding: 20px;
+  }
+
+  .login-shell {
+    min-height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .login-showcase {
+    display: none;
+  }
+
+  .login-panel {
+    min-height: 620px;
+    padding: 40px 28px;
+  }
+
+  .login-mobile-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin-bottom: 42px;
+    color: #172033;
+    font-size: 17px;
+    font-weight: 750;
+  }
+
+  .login-mobile-brand .login-brand-icon {
+    border-color: #dbe4f0;
+    background: #eff6ff;
+    color: #2563eb;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 0;
+  }
+
+  .login-shell {
+    min-height: 100vh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .login-panel {
+    padding: 30px 22px;
+  }
+
+  .login-header h2 {
+    font-size: 25px;
+  }
+}
+/* PropertyHub logo */
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  display: block;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.login-brand-logo {
+  width: 40px;
+  height: 40px;
+  display: block;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.login-mobile-logo {
+  width: 38px;
+  height: 38px;
+  display: block;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.feature-letter {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+}

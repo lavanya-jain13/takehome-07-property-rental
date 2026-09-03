@@ -13,6 +13,7 @@ import DashboardPage from "./pages/DashboardPage";
 import UnitsPage from "./pages/UnitsPage";  
 import MaintenancePage from "./pages/MaintenancePage";
 import RentPage from "./pages/RentPage";
+import RentAlertsPage from "./pages/RentAlertsPage";
 
 function App() {
   const { isAuthenticated, user } = useAuth();
@@ -71,9 +72,7 @@ function App() {
 
             <Route
               path="/rent/alerts"
-              element={
-                <div>Rent alerts coming next.</div>
-              }
+              element={<RentAlertsPage />}
             />
 
             <Route

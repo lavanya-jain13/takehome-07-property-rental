@@ -1,10 +1,8 @@
-import { Bell, Search } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
-//   "/properties": "Properties",
   "/units": "Units",
   "/maintenance": "Maintenance",
   "/rent": "Rent",
@@ -26,23 +24,6 @@ export default function Topbar() {
       </div>
 
       <div className="topbar-actions">
-        <button
-          type="button"
-          className="icon-button"
-          aria-label="Search"
-        >
-          <Search size={19} />
-        </button>
-
-        <button
-          type="button"
-          className="icon-button notification-button"
-          aria-label="Notifications"
-        >
-          <Bell size={19} />
-          <span className="notification-dot" />
-        </button>
-
         <div className="topbar-user">
           <div className="user-avatar small">
             {user?.name?.charAt(0).toUpperCase()}

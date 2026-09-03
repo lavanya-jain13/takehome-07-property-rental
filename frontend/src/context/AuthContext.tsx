@@ -1,13 +1,18 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState,
   type ReactNode,
 } from "react";
 
-import { login as loginRequest } from "../services/auth.service";
+import {
+  login as loginRequest,
+  getCurrentUser,
+} from "../services/auth.service";
 import type {
   LoginRequest,
+  LoginResponse,
   User,
 } from "../types/auth";
 
@@ -33,8 +38,21 @@ export function AuthProvider({
     null
   );
   const [isLoading, setIsLoading] =
-    useState(false);
+    useState(true);
+useEffect(() => {
+  const restoreSession = async () => {
+    try {
+      const response = await getCurrentUser();
+      setUser(response.user);
+    } catch {
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  restoreSession();
+}, []);
   const login = async (
     credentials: LoginRequest
   ) => {
