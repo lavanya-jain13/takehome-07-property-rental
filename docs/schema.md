@@ -11,11 +11,14 @@ represented using the `role` column rather than separate tables.
 |---|---|---|
 | id | UUID | Primary key |
 | name | VARCHAR(100) | User's name |
-| email | VARCHAR(255) | Login email |
+| email | VARCHAR(255) | Login email; unique |
 | password_hash | VARCHAR(255) | Hashed password |
 | role | VARCHAR(20) | `MANAGER` or `CONTRACTOR` |
 | created_at | TIMESTAMPTZ | Account creation time |
 | updated_at | TIMESTAMPTZ | Last update time |
+
+The database enforces unique email addresses and restricts the role to
+`MANAGER` or `CONTRACTOR`.
 
 ### units
 
@@ -32,8 +35,10 @@ Represents the rental units managed by the application.
 | created_at | TIMESTAMPTZ | Creation time |
 | updated_at | TIMESTAMPTZ | Last update time |
 
-Units are archived instead of deleted so that their maintenance and rent
-history remains available.
+`unit_number` is unique. `monthly_rent` must be greater than zero.
+
+Units are archived instead of deleted so that their related rent and
+maintenance history is preserved.
 
 ### maintenance_requests
 
@@ -46,13 +51,18 @@ Stores maintenance issues reported for units.
 | created_by | UUID | References `users.id` |
 | title | VARCHAR(200) | Short description of the issue |
 | description | TEXT | Detailed description |
-| priority | VARCHAR(20) | Request priority |
+| priority | VARCHAR(20) | `LOW`, `MEDIUM`, or `HIGH` |
 | status | VARCHAR(20) | Current request status |
 | created_at | TIMESTAMPTZ | Creation time |
 | updated_at | TIMESTAMPTZ | Last update time |
 
 The supported status values are `REPORTED`, `TRIAGED`, `SCHEDULED`, and
 `RESOLVED`.
+
+The supported priority values are `LOW`, `MEDIUM`, and `HIGH`.
+
+Indexes are maintained on `unit_id`, `created_by`, `status`, and `priority`
+to support common maintenance queries.
 
 ### maintenance_assignments
 
@@ -67,6 +77,9 @@ Associates contractors with maintenance requests.
 
 This is the associative table used to represent the many-to-many relationship
 between maintenance requests and contractors.
+
+The combination of `maintenance_request_id` and `contractor_id` is unique, so
+the same contractor cannot be assigned to the same request more than once.
 
 ### rent_payments
 
@@ -83,6 +96,11 @@ Stores rent recorded against a unit for a particular month.
 
 `payment_month` is stored as the first day of the relevant month.
 
+The combination of `unit_id` and `payment_month` is unique, preventing more
+than one rent record for the same unit and month.
+
+The payment amount must be zero or greater.
+
 ### timeline_events
 
 Stores the history of actions performed on maintenance requests.
@@ -98,8 +116,16 @@ Stores the history of actions performed on maintenance requests.
 | note | TEXT | Optional event note |
 | created_at | TIMESTAMPTZ | Event creation time |
 
-Timeline events are append-only. They are not edited or deleted after being
-created.
+Supported event types are:
+
+- `REQUEST_CREATED`
+- `STATUS_CHANGED`
+- `CONTRACTOR_ASSIGNED`
+- `CONTRACTOR_UNASSIGNED`
+- `NOTE_ADDED`
+
+Timeline events are append-only at the application level. The application
+does not expose update or delete operations for historical events.
 
 ### rent_alert_dismissals
 
@@ -116,11 +142,12 @@ and month.
 
 `rent_month` is stored as the first day of the relevant month.
 
----
+The combination of `unit_id` and `rent_month` is unique, meaning a manager's
+dismissal is recorded once for a specific unit and month.
 
 ## Relationships
 
-Most relationships in the schema are one-to-many:
+The schema contains the following relationships:
 
 - One `USER` can create many `MAINTENANCE_REQUEST` records.
 - One `UNIT` can have many `MAINTENANCE_REQUEST` records.
@@ -134,14 +161,13 @@ Most relationships in the schema are one-to-many:
 - One `UNIT` can have many `RENT_ALERT_DISMISSAL` records.
 
 The underlying relationship between maintenance requests and contractors is
-many-to-many. It is represented using `maintenance_assignments`:
+many-to-many:
 
 `MAINTENANCE_REQUEST M:N USER (CONTRACTOR)`
 
-This allows multiple contractors to be assigned to one request and allows one
-contractor to work on multiple requests.
-
----
+It is represented through `maintenance_assignments`. This allows multiple
+contractors to be assigned to one request while allowing a contractor to work
+on multiple requests.
 
 ## Database constraints vs application constraints
 
@@ -150,19 +176,21 @@ always be true regardless of where the data is written.
 
 Database-enforced constraints include:
 
-- Primary keys
-- Foreign keys
-- Required fields using `NOT NULL`
-- Unique user emails
-- Unique unit numbers
-- Unique `(maintenance_request_id, contractor_id)` assignments
-- Unique `(unit_id, payment_month)` rent records
-- Unique `(unit_id, rent_month)` alert dismissals
-- Valid numeric ranges such as non-negative rent/payment amounts
-- Allowed values for role, status, priority, and other fixed fields using
-  `CHECK` constraints
+- Primary keys.
+- Foreign keys.
+- Required fields using `NOT NULL`.
+- Unique user emails.
+- Unique unit numbers.
+- Unique `(maintenance_request_id, contractor_id)` assignments.
+- Unique `(unit_id, payment_month)` rent records.
+- Unique `(unit_id, rent_month)` alert dismissals.
+- `monthly_rent > 0`.
+- `amount >= 0`.
+- Allowed values for roles, priorities, statuses, and timeline event types
+  using `CHECK` constraints.
 
-Application code handles rules that depend on the current business workflow.
+Application code handles rules that depend on current business workflow or
+authorization.
 
 Examples include:
 
@@ -175,14 +203,8 @@ Examples include:
 - A request cannot move to `SCHEDULED` without a contractor assignment.
 - A resolved request can only be reopened into `TRIAGED`.
 
-The boundary is intentional: the database protects data integrity, while the
-application handles rules that require business context or authorization.
-
-Timeline immutability is protected at both levels. The application does not
-provide update/delete operations for timeline events, and the database can
-also restrict those operations to prevent accidental modification of history.
-
----
+The boundary is intentional: the database protects structural data integrity,
+while the application handles business workflow and authorization rules.
 
 ## Deliberate denormalisation
 
@@ -199,8 +221,6 @@ grace period, and dismissal information.
 
 If the system later needed tenant accounts, tenant history, multiple tenants,
 leases, or a tenant portal, this model would need to be expanded.
-
----
 
 ## What would break first at 100x the data?
 
@@ -226,5 +246,5 @@ be generated synchronously. At that point, an asynchronous export process
 would be a reasonable next step.
 
 We are deliberately not introducing Redis, a message broker, or other
-infrastructure at this stage because the current scale and requirements do
-not justify that complexity.
+infrastructure at this stage because the current scale and requirements do not
+justify that complexity.
