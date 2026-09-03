@@ -7,9 +7,10 @@
     "doc": "docs"
   },
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
-  },
+  "dev": "node --watch src/server.js",
+  "start": "node src/server.js",
+  "migrate": "knex migrate:latest"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
