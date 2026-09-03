@@ -7,8 +7,16 @@ const maintenanceRoutes = require("./modules/maintenance/maintenance.routes");
 const rentRoutes = require("./modules/rent/rent.routes");
 const dashboardRoutes = require("./modules/dashboard/dashboard.routes");
 const usersRoutes = require("./modules/users/users.routes");
+const cors = require("cors");
 
 const app = express();
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
