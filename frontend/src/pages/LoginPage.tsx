@@ -1,10 +1,14 @@
 import {
+  Building2,
   ShieldCheck,
   Wrench,
   IndianRupee,
 } from "lucide-react";
 
-import { useState, type FormEvent } from "react";
+import {
+  useState,
+  type FormEvent,
+} from "react";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -79,12 +83,8 @@ export default function LoginPage() {
             <div className="login-features">
               <div className="login-feature">
                 <div className="login-feature-icon">
-                  <img
-                    src="/logo.jpg"
-                    alt=""
-                    className="feature-logo"
-                  />
-                </div>
+  <Building2 size={18} />
+</div>
 
                 <div>
                   <strong>
