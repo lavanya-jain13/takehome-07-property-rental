@@ -12,6 +12,8 @@ The application is built as a modular monolith with three main pieces:
   units, maintenance requests, contractor assignments, rent payments,
   timeline events, and rent-alert dismissals.
 
+![System Architecture](../images/architecture.png)
+
 The frontend communicates with the backend through HTTP/JSON API requests.
 Authentication is handled using an HTTP-only cookie. The backend authenticates
 the request, checks the user's role and permissions, applies the relevant

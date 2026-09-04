@@ -1,5 +1,7 @@
 # Schema
 
+![Database ERD](../images/erd.png)
+
 ## Tables
 
 ### users
