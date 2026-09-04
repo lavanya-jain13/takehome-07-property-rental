@@ -12,7 +12,7 @@ The application is a role-based Property Rental & Maintenance system with
 separate workflows for managers and maintenance contractors.
 
 For the best evaluation experience, start with the manager account to explore
-the full application. The contractor account demonstrates the restricted
+the full application. The contractor accounts demonstrate the restricted
 maintenance workflow and server-side access controls.
 
 The application uses session-based authentication through an HTTP-only cookie.
@@ -21,15 +21,38 @@ frontend hosted on Vercel and the backend hosted on Render.
 
 The production database is PostgreSQL hosted on Supabase.
 
-## Demo credentials
+### Demo Credentials
 
-| Role | Email | Password |
-|------|-------|----------|
-| Manager | manager@example.com | Password123! |
-| Contractor | contractor@example.com | Password123! |
+All demo accounts use the password:
+
+`Password123!`
+
+**Manager**
+- Email: `manager@example.com`
+- Password: `Password123!`
+
+**Contractors**
+- Email: `contractor@example.com`
+- Password: `Password123!`
+- Email: `priya.contractor@example.com`
+- Password: `Password123!`
+- Email: `rahul.contractor@example.com`
+- Password: `Password123!`
+
+The demo data includes maintenance requests assigned to different contractors, including requests with multiple contractors assigned.
 
 > These credentials are provided specifically for evaluation of the deployed
 > application.
+
+### Rent Alerts Demo Note
+
+Rent Alerts follow the configured rent policy: rent is due on the 1st of each month with a 5-day grace period. Therefore, for the September 2026 rent cycle, overdue alerts become visible starting September 7, 2026.
+
+The demo data includes:
+- DEMO-102: partial September rent payment (underpaid)
+- DEMO-104: no September rent payment (unpaid)
+
+These units will appear in Rent Alerts once the September grace period expires.
 
 ## Stack
 
@@ -179,20 +202,6 @@ The application is deployed as three separate components:
                     │       PostgreSQL DB      │
                     └──────────────────────────┘
 
-## Goal checklist
-
-| # | Goal | Status | Notes |
-|---|------|--------|-------|
-| 1 | Accounts and roles | Done | Manager and contractor authentication with server-side role enforcement |
-| 2 | Units and rent | Done | Unit CRUD, archive/restore, monthly rent, tenant information, and rent recording |
-| 3 | Maintenance requests | Done | Request creation/editing, priorities, unit association, and contractor assignments |
-| 4 | Maintenance lifecycle | Done | Server-enforced `REPORTED → TRIAGED → SCHEDULED → RESOLVED` lifecycle with reopening support |
-| 5 | Contractor assignment | Done | Multiple contractors can be assigned to a request; contractors only access assigned requests |
-| 6 | Finding requests | Done | Server-side search, filters, sorting, pagination, and total match count |
-| 7 | Bulk rent | Done | Individual and bulk rent recording with matched, underpaid, overpaid, and unmatched results |
-| 8 | Dashboard | Done | Open maintenance, overdue rent, resolved-this-week, collection metrics, and maintenance/reporting views |
-| 9 | Immutable maintenance history | Done | Request creation, status changes, assignments, unassignments, and notes are recorded as timeline events |
-| 10 | Rent alerts | Done | Grace-period-based overdue alerts, manager dismissal, navigation count, and month-specific alert handling |
 
 ## How much time did you actually spend?
 
